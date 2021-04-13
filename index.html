@@ -1,5 +1,10 @@
 <html>
-    <body>
-        <script src="dist/index.js"></script>
-    </body>
+
+<body>
+    <div id="map" style="height: 80%"></div>
+    <script src=`https://maps.googleapis.com/maps/api/js?v=3.exp&key=${process.env.MAPS_KEY}`></script>
+    <script src="src/index.ts"></script>
+    <link rel="stylesheet" href="/app.css"/>
+</body>
+
 </html>
