@@ -1,11 +1,18 @@
-import { Driver } from "./Driver";
 import { Map } from "./Map";
+import { Driver } from "./Driver";
 import { Passenger } from "./Passenger";
+import { MyHome } from "./MyHome";
 
 let map = new Map("map");
 const driver = new Driver();
 const passenger = new Passenger();
+const myHome = new MyHome(passenger);
 
-map.AddDriverMarker(driver);
-map.AddPassengerMarker(passenger);
+map.AddMarker(driver);
+map.AddMarker(passenger);
+map.AddMarker(myHome);
 
+map.SearchText({
+    input: <HTMLInputElement>document.getElementById('address')!,
+    searchButton: <HTMLButtonElement>document.getElementById('searchButton')!
+});

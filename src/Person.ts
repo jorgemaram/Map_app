@@ -1,4 +1,4 @@
-export abstract class Person {
+export abstract class Person implements Mappable{
     protected name: string,
     protected location: {
         lat: string,
@@ -15,5 +15,9 @@ export abstract class Person {
             lat: location.lat,
             lng: location.lng
         }
+    }
+
+    markerTitle(address: () => string): string {
+        return `La direccion de ${this.name} es ${address()}`
     }
 }

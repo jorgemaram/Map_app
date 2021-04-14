@@ -1,8 +1,9 @@
-import { Passenger } from "./Passenger";
-import { Driver } from "./Driver";
+import { MapGeoCode } from "./MapGeoCode";
+import { Person } from "./Person";
 
 export class Map {
     private googleMap: google.maps.Map;
+    private geoCoder : MapGeoCode
     constructor(divId: string) {
         this.googleMap = new google.maps.Map(document.getElementById(divId)!,
             {
@@ -12,24 +13,20 @@ export class Map {
                     lng: 0
                 }
             });
+        this.geoCoder = new MapGeoCode(this.googleMap);
     }
 
-    AddPassengerMarker(passenger: Passenger) {
-        new google.maps.Marker({
+    AddMarker(mappable: Mappable) {
+        const marker = new google.maps.Marker({
             map: this.googleMap,
             position: {
-                lat: parseInt(passenger.getLocation.lat),
-                lng: parseInt(passenger.getLocation.lng)
+                lat: parseInt(mappable.getLocation.lat),
+                lng: parseInt(mappable.getLocation.lng)
             }
         })
+        this.geoCoder.AddMarkerInfo(marker, mappable);
     }
-    AddDriverMarker(driver: Driver) {
-        new google.maps.Marker({
-            map: this.googleMap,
-            position: {
-                lat: parseInt(driver.getLocation.lat),
-                lng: parseInt(driver.getLocation.lng)
-            }
-        })
+    SearchText(options: SearchOptions): void{
+        this.geoCoder.SearchText(options)
     }
 }

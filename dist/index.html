@@ -1,8 +1,13 @@
 <html>
 
 <script src="/app.ae05fb60.js"></script><body>
+    <div class="search">
+        <input type="text" id="address">
+        <button id="searchButton" type="submit">Buscar dirección</button>
+    </div>
     <div id="map" style="height: 80%"></div>
-    <script src="/js.81ce3eb3.?v=3.exp&key=$%7Bprocess.env.MAPS_KEY%7D%60"></script>
+    <!-- insert your own API KEY from Google Maps Api -->
+    <script async="" defer="" src="https://maps.googleapis.com/maps/api/js?key=<%=process.env.MAPS_KEY>&callback=initMap" type="text/javascript"></script> 
     <script src="/src.f10117fe.js"></script>
     <link rel="stylesheet" href="/app.ae05fb60.css">
 </body>

@@ -117,7 +117,121 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"node_modules/faker/lib/fake.js":[function(require,module,exports) {
+})({"src/MapGeoCode.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MapGeoCode = void 0;
+
+var MapGeoCode =
+/** @class */
+function () {
+  function MapGeoCode(map) {
+    this.map = map;
+    this.geocoder = new google.maps.Geocoder();
+  }
+
+  MapGeoCode.prototype.AddMarkerInfo = function (marker, mappable) {
+    var _this = this;
+
+    marker.addListener('click', function () {
+      var latlng = {
+        lat: marker.getPosition().lat(),
+        lng: marker.getPosition().lng()
+      };
+
+      _this.geocoder.geocode({
+        'location': latlng
+      }, function (results, status) {
+        if (status == 'OK') {
+          var infoWindow = new google.maps.InfoWindow({
+            content: mappable.markerTitle(function () {
+              return results[0].formatted_address;
+            })
+          });
+          infoWindow.open(_this.map, marker);
+        } else {
+          window.alert('Error en la geolocalización' + status);
+        }
+      });
+    });
+  };
+
+  MapGeoCode.prototype.SearchText = function (options) {
+    var _this = this;
+
+    options.searchButton.addEventListener('click', function () {
+      var address = options.input.value;
+
+      _this.geocoder.geocode({
+        'address': address
+      }, function (results, status) {
+        if (status === "OK") {
+          _this.map.setCenter(results[0].geometry.location);
+
+          _this.map.setZoom(16);
+
+          new google.maps.Marker({
+            map: _this.map,
+            position: results[0].geometry.location
+          });
+        } else {
+          window.alert('Error en la geolocalización' + status);
+        }
+      });
+    });
+  };
+
+  return MapGeoCode;
+}();
+
+exports.MapGeoCode = MapGeoCode;
+},{}],"src/Map.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Map = void 0;
+
+var MapGeoCode_1 = require("./MapGeoCode");
+
+var Map =
+/** @class */
+function () {
+  function Map(divId) {
+    this.googleMap = new google.maps.Map(document.getElementById(divId), {
+      zoom: 1,
+      center: {
+        lat: 0,
+        lng: 0
+      }
+    });
+    this.geoCoder = new MapGeoCode_1.MapGeoCode(this.googleMap);
+  }
+
+  Map.prototype.AddMarker = function (mappable) {
+    var marker = new google.maps.Marker({
+      map: this.googleMap,
+      position: {
+        lat: parseInt(mappable.getLocation.lat),
+        lng: parseInt(mappable.getLocation.lng)
+      }
+    });
+    this.geoCoder.AddMarkerInfo(marker, mappable);
+  };
+
+  Map.prototype.SearchText = function (options) {
+    this.geoCoder.SearchText(options);
+  };
+
+  return Map;
+}();
+
+exports.Map = Map;
+},{"./MapGeoCode":"src/MapGeoCode.ts"}],"node_modules/faker/lib/fake.js":[function(require,module,exports) {
 /*
   fake.js - generator method for combining faker methods based on string input
 
@@ -136894,6 +137008,11 @@ function () {
     enumerable: false,
     configurable: true
   });
+
+  Person.prototype.markerTitle = function (address) {
+    return "La direccion de " + this.name + " es " + address();
+  };
+
   return Person;
 }();
 
@@ -136960,52 +137079,7 @@ function (_super) {
 }(Person_1.Person);
 
 exports.Driver = Driver;
-},{"faker":"node_modules/faker/index.js","./Person":"src/Person.ts"}],"src/Map.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Map = void 0;
-
-var Map =
-/** @class */
-function () {
-  function Map(divId) {
-    this.googleMap = new google.maps.Map(document.getElementById(divId), {
-      zoom: 1,
-      center: {
-        lat: 0,
-        lng: 0
-      }
-    });
-  }
-
-  Map.prototype.AddPassengerMarker = function (passenger) {
-    new google.maps.Marker({
-      map: this.googleMap,
-      position: {
-        lat: parseInt(passenger.getLocation.lat),
-        lng: parseInt(passenger.getLocation.lng)
-      }
-    });
-  };
-
-  Map.prototype.AddDriverMarker = function (driver) {
-    new google.maps.Marker({
-      map: this.googleMap,
-      position: {
-        lat: parseInt(driver.getLocation.lat),
-        lng: parseInt(driver.getLocation.lng)
-      }
-    });
-  };
-
-  return Map;
-}();
-
-exports.Map = Map;
-},{}],"src/Passenger.ts":[function(require,module,exports) {
+},{"faker":"node_modules/faker/index.js","./Person":"src/Person.ts"}],"src/Passenger.ts":[function(require,module,exports) {
 "use strict";
 
 var __extends = this && this.__extends || function () {
@@ -137067,25 +137141,67 @@ function (_super) {
 }(Person_1.Person);
 
 exports.Passenger = Passenger;
-},{"faker":"node_modules/faker/index.js","./Person":"src/Person.ts"}],"src/index.ts":[function(require,module,exports) {
+},{"faker":"node_modules/faker/index.js","./Person":"src/Person.ts"}],"src/MyHome.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MyHome = void 0;
+
+var MyHome =
+/** @class */
+function () {
+  function MyHome(passenger) {
+    this.location = {
+      lat: (parseInt(passenger.getLocation.lat) + 0.0002).toString(),
+      lng: (parseInt(passenger.getLocation.lng) + 0.0002).toString()
+    };
+  }
+
+  Object.defineProperty(MyHome.prototype, "getLocation", {
+    get: function get() {
+      return this.location;
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  MyHome.prototype.markerTitle = function (address) {
+    return "La direccion de mi casa es " + address();
+  };
+
+  return MyHome;
+}();
+
+exports.MyHome = MyHome;
+},{}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Driver_1 = require("./Driver");
-
 var Map_1 = require("./Map");
 
+var Driver_1 = require("./Driver");
+
 var Passenger_1 = require("./Passenger");
+
+var MyHome_1 = require("./MyHome");
 
 var map = new Map_1.Map("map");
 var driver = new Driver_1.Driver();
 var passenger = new Passenger_1.Passenger();
-map.AddDriverMarker(driver);
-map.AddPassengerMarker(passenger);
-},{"./Driver":"src/Driver.ts","./Map":"src/Map.ts","./Passenger":"src/Passenger.ts"}],"../../../../../home/jorgemaram/.nvm/versions/node/v14.13.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var myHome = new MyHome_1.MyHome(passenger);
+map.AddMarker(driver);
+map.AddMarker(passenger);
+map.AddMarker(myHome);
+map.SearchText({
+  input: document.getElementById('address'),
+  searchButton: document.getElementById('searchButton')
+});
+},{"./Map":"src/Map.ts","./Driver":"src/Driver.ts","./Passenger":"src/Passenger.ts","./MyHome":"src/MyHome.ts"}],"../../../../../home/jorgemaram/.nvm/versions/node/v14.13.0/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -137113,7 +137229,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52381" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51237" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
